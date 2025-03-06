@@ -5,14 +5,14 @@
 Network Working Group                                       T. Geoghegan
 Internet-Draft                                                      ISRG
 Intended status: Standards Track                               C. Patton
-Expires: 6 September 2025                                     Cloudflare
+Expires: 7 September 2025                                     Cloudflare
                                                                B. Pitman
                                                                     ISRG
                                                              E. Rescorla
                                                              Independent
                                                               C. A. Wood
                                                               Cloudflare
-                                                            5 March 2025
+                                                            6 March 2025
 
 
   Distributed Aggregation Protocol for Privacy Preserving Measurement
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 September 2025.
+   This Internet-Draft will expire on 7 September 2025.
 
 Copyright Notice
 
@@ -1518,7 +1518,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    *  report_metadata is public metadata describing the report.
 
       -  report_id is used by the Aggregators to ensure the report is
-         not replayed (Figure 4).  The Client MUST generate this by
+         not replayed (Figure 5).  The Client MUST generate this by
          generating 16 random bytes using a cryptographically secure
          random number generator.
 
@@ -1675,7 +1675,10 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Clients holding multiple reports can use bulk upload endpoint and
    send an HTTP POST to {leader}/tasks/{task-id}/reports/bulk with media
-   type "application/dap-bulk-report".
+   type "application/dap-bulk-report".  Bulk submission is strictly a
+   performance optimization as it allows for savings on the wire
+   submitting multiple reports that are bound to a single task and use
+   the same extensions.
 
    The "application/dap-bulk-report" format contains a prologue that
    encodes extensions that are common to all reports.  The header is
@@ -1686,6 +1689,15 @@ aggregation job 1                   aggregation job 2          aggregation job j
    Extension common_extensions<0..2^16-1>;
    Report report[REPORT_COUNT];
    } BulkReport;
+
+                        Figure 3: Bulk Report Format
+
+   The use of REPORT_COUNT in Figure 3 is a small abuse of the TLS
+   syntax to signify that any number of reports are included.  This
+   "value" could be any positive integer.  Unlike a variable-length
+   field, as denoted with &lt; and >, this format does not require that
+   the size of all included reports be known before constructing a
+   request.
 
    The common_extensions field contains common extensions that are added
    to the set of public report extensions in each report that follows.
@@ -1709,7 +1721,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    During the upload process, the Leader SHOULD communicate the index of
    the latest report successfuly stored on the server side.  All the
    rejected report indices SHOULD be communicated back to the client as
-   they occur in the system as illustrated in Figure 3
+   they occur in the system as illustrated in Figure 4
 
    +----------------------------------------------+
    |               Upload progress                |
@@ -1724,7 +1736,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
                +----------------+
                uncertainty window
 
-                       Figure 3: Bulk upload progress
+                       Figure 4: Bulk upload progress
 
    In case when failures occur and the connection between Leader and
    Client is terminated, all reports within uncertainty window SHOULD be
@@ -1799,7 +1811,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    to combine into a valid, refined measurement.
 
    VDAF preparation is mapped onto an aggregation job as illustrated in
-   Figure 4.  The protocol is comprised of a sequence of HTTP requests
+   Figure 5.  The protocol is comprised of a sequence of HTTP requests
    from the Leader to the Helper, the first of which includes the
    aggregation parameter, the Helper's report share for each report in
    the job, and for each report the initialization step for preparation.
@@ -1840,7 +1852,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
       v                                                     v
      leader_out_share                         helper_out_share
 
-           Figure 4: Overview of the DAP aggregation interaction.
+           Figure 5: Overview of the DAP aggregation interaction.
 
    The number of steps, and the type of the responses, depends on the
    VDAF.  The message structures and processing rules are specified in
@@ -3365,7 +3377,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    In addition, for each DAP task, the Leader is required to:
 
    *  Implement and store state for the form of inter- and intra-batch
-      replay mitigation in Figure 4.  This requires storing the report
+      replay mitigation in Figure 5.  This requires storing the report
       IDs of all reports processed for a given task.  Implementations
       may find it helpful to track additional information, like the
       timestamp, so that the storage used for anti-replay can be sharded
