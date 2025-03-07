@@ -5,14 +5,14 @@
 Network Working Group                                       T. Geoghegan
 Internet-Draft                                                      ISRG
 Intended status: Standards Track                               C. Patton
-Expires: 7 September 2025                                     Cloudflare
+Expires: 8 September 2025                                     Cloudflare
                                                                B. Pitman
                                                                     ISRG
                                                              E. Rescorla
                                                              Independent
                                                               C. A. Wood
                                                               Cloudflare
-                                                            6 March 2025
+                                                            7 March 2025
 
 
   Distributed Aggregation Protocol for Privacy Preserving Measurement
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 September 2025.
+   This Internet-Draft will expire on 8 September 2025.
 
 Copyright Notice
 
@@ -153,8 +153,8 @@ Table of Contents
        8.6.1.  VDAF Verification Key Requirements
        8.6.2.  Batch Parameters
        8.6.3.  Task Configuration Agreement and Consistency
-       8.6.4.  Bulk uploads
-     8.7.  Infrastructure Diversity
+     8.7.  Bulk uploads
+     8.8.  Infrastructure Diversity
    9.  IANA Considerations
      9.1.  Protocol Message Media Types
        9.1.1.  "application/dap-hpke-config-list" media type
@@ -3830,7 +3830,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    contribute to a task, they should also share a consistent view of the
    task configuration.
 
-8.6.4.  Bulk uploads
+8.7.  Bulk uploads
 
    The potential for a single client to generate large amounts of work
    using Section 4.6.3 for a DAP service is a serious threat to service
@@ -3841,7 +3841,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    The logical entity to make this request is a collector, which is
    likely to be known to the leader.
 
-8.7.  Infrastructure Diversity
+8.8.  Infrastructure Diversity
 
    DAP deployments should ensure that Aggregators do not have common
    dependencies that would enable a single vendor to reassemble
