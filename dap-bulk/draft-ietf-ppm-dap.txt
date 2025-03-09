@@ -159,14 +159,15 @@ Table of Contents
      9.1.  Protocol Message Media Types
        9.1.1.  "application/dap-hpke-config-list" media type
        9.1.2.  "application/dap-report" media type
-       9.1.3.  "application/dap-aggregation-job-init-req" media type
-       9.1.4.  "application/dap-aggregation-job-resp" media type
-       9.1.5.  "application/dap-aggregation-job-continue-req" media
+       9.1.3.  "application/dap-bulk-report" media type
+       9.1.4.  "application/dap-aggregation-job-init-req" media type
+       9.1.5.  "application/dap-aggregation-job-resp" media type
+       9.1.6.  "application/dap-aggregation-job-continue-req" media
                type
-       9.1.6.  "application/dap-aggregate-share-req" media type
-       9.1.7.  "application/dap-aggregate-share" media type
-       9.1.8.  "application/dap-collection-job-req" media type
-       9.1.9.  "application/dap-collection-job-resp" media type
+       9.1.7.  "application/dap-aggregate-share-req" media type
+       9.1.8.  "application/dap-aggregate-share" media type
+       9.1.9.  "application/dap-collection-job-req" media type
+       9.1.10. "application/dap-collection-job-resp" media type
      9.2.  DAP Type Registries
        9.2.1.  Batch Modes Registry
        9.2.2.  Report Extension Registry
@@ -3994,7 +3995,50 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Change controller:  IESG
 
-9.1.3.  "application/dap-aggregation-job-init-req" media type
+9.1.3.  "application/dap-bulk-report" media type
+
+   Type name:  application
+
+   Subtype name:  dap-bulk-report
+
+   Required parameters:  N/A
+
+   Optional parameters:  None
+
+   Encoding considerations:  only "8bit" or "binary" is permitted
+
+   Security considerations:  see Section 4.6.3 of the published
+      specification
+
+   Interoperability considerations:  N/A
+
+   Published specification:  RFC XXXX
+
+   Applications that use this media type:  N/A
+
+   Fragment identifier considerations:  N/A
+
+   Additional information:  Magic number(s):  N/A
+
+                            Deprecated alias names for this type:  N/A
+
+                            File extension(s):  N/A
+
+                            Macintosh file type code(s):  N/A
+
+   Person and email address to contact for further information:  see Aut
+      hors' Addresses section of the published specification
+
+   Intended usage:  COMMON
+
+   Restrictions on usage:  N/A
+
+   Author:  see Authors' Addresses section of the published
+      specification
+
+   Change controller:  IESG
+
+9.1.4.  "application/dap-aggregation-job-init-req" media type
 
    Type name:  application
 
@@ -4037,7 +4081,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Change controller:  IESG
 
-9.1.4.  "application/dap-aggregation-job-resp" media type
+9.1.5.  "application/dap-aggregation-job-resp" media type
 
    Type name:  application
 
@@ -4080,7 +4124,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Change controller:  IESG
 
-9.1.5.  "application/dap-aggregation-job-continue-req" media type
+9.1.6.  "application/dap-aggregation-job-continue-req" media type
 
    Type name:  application
 
@@ -4123,7 +4167,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Change controller:  IESG
 
-9.1.6.  "application/dap-aggregate-share-req" media type
+9.1.7.  "application/dap-aggregate-share-req" media type
 
    Type name:  application
 
@@ -4166,7 +4210,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Change controller:  IESG
 
-9.1.7.  "application/dap-aggregate-share" media type
+9.1.8.  "application/dap-aggregate-share" media type
 
    Type name:  application
 
@@ -4209,7 +4253,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Change controller:  IESG
 
-9.1.8.  "application/dap-collection-job-req" media type
+9.1.9.  "application/dap-collection-job-req" media type
 
    Type name:  application
 
@@ -4252,7 +4296,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Change controller:  IESG
 
-9.1.9.  "application/dap-collection-job-resp" media type
+9.1.10.  "application/dap-collection-job-resp" media type
 
    Type name:  application
 
