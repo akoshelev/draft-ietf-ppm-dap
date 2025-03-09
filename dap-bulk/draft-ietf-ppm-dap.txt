@@ -5,14 +5,14 @@
 Network Working Group                                       T. Geoghegan
 Internet-Draft                                                      ISRG
 Intended status: Standards Track                               C. Patton
-Expires: 8 September 2025                                     Cloudflare
+Expires: 10 September 2025                                    Cloudflare
                                                                B. Pitman
                                                                     ISRG
                                                              E. Rescorla
                                                              Independent
                                                               C. A. Wood
                                                               Cloudflare
-                                                            7 March 2025
+                                                            9 March 2025
 
 
   Distributed Aggregation Protocol for Privacy Preserving Measurement
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 September 2025.
+   This Internet-Draft will expire on 10 September 2025.
 
 Copyright Notice
 
@@ -1518,7 +1518,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    *  report_metadata is public metadata describing the report.
 
       -  report_id is used by the Aggregators to ensure the report is
-         not replayed (Figure 5).  The Client MUST generate this by
+         not replayed (Figure 4).  The Client MUST generate this by
          generating 16 random bytes using a cryptographically secure
          random number generator.
 
@@ -1673,12 +1673,11 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
 4.6.3.  Bulk upload
 
-   Clients holding multiple reports can use bulk upload endpoint and
-   send an HTTP POST to {leader}/tasks/{task-id}/reports/bulk with media
-   type "application/dap-bulk-report".  Bulk submission is strictly a
-   performance optimization as it allows for savings on the wire
-   submitting multiple reports that are bound to a single task and use
-   the same extensions.
+   Clients or intermediates with multiple reports in hand can use bulk
+   upload endpoint and send an HTTP POST to {leader}/tasks/{task-
+   id}/reports/bulk with media type "application/dap-bulk-report".  A
+   bulk request is equivalent to multiple separate submissions and is
+   strictly a performance optimization.
 
    The "application/dap-bulk-report" format contains a prologue that
    encodes extensions that are common to all reports.  The header is
@@ -1709,39 +1708,32 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
 4.6.4.  Partial failures
 
-   Clients that use Section 4.6.3 need to be aware about the progress
-   server made processing their uploads.  That includes keeping track of
-   report submissions stored durably by the aggregator, reports rejected
-   and failed uploads.
+   Bulk uploads take longer time to complete and have higher chance to
+   fail, leaving clients uncertain about the status of their uploads.
+   Replaying the entire request again wastes both server and client
+   resources and network bandwidth.
 
-   Reports in the upload are implicitly enumerated by the server using
-   0-based indexing.  First report in the upload gets assigned upload
-   index 0, second report gets index 1 and so on.
+   To provide more robust failure handling, reports in the upload MUST
+   be implicitly enumerated by the Server using 0-based indexing.
+   Monotonically increasing report index is used to communicate the
+   upload status to the Client.
 
-   During the upload process, the Leader SHOULD communicate the index of
-   the latest report successfuly stored on the server side.  All the
-   rejected report indices SHOULD be communicated back to the client as
-   they occur in the system as illustrated in Figure 4
+   Any report in the upload may be rejected for reasons listed in
+   (Section 4.6.2).
 
-   +----------------------------------------------+
-   |               Upload progress                |
-   +-----------+----------------+-----------------+-----------+
-   | Waiting   |  Uploading     |  Acknowledged   | Rejected  |
-   +-----------+----------------+-----------------+-----------+
-   | ... | 11 | | 10 | ... | 4 | | 3 |  ...  | 0 | | 5 | | 2 |
+   Leader SHOULD provide a means to Clients to obtain status of the
+   upload. ~~~ tls-presentation struct { /* The index of the latest
+   report processed so far by the server _/ uint32 latest_index, /_ The
+   list of indices of reports rejected on the server side */ uint32
+   rejected<..>, } BulkReportStatus; ~~~
 
-               |                |
-               |                |
-               |                |
-               +----------------+
-               uncertainty window
+   Server MAY compress large sequences of rejected reports into ranges,
+   to avoid payload blowout.
 
-                       Figure 4: Bulk upload progress
-
-   In case when failures occur and the connection between Leader and
-   Client is terminated, all reports within uncertainty window SHOULD be
-   submitted again.  Clients MUST be able to handle reportRejected
-   Section 4.6.2 errors for these uploads.
+   If bulk upload request fails for any reason, Client MAY choose to
+   submit bulk upload request again.  Client SHOULD only include reports
+   not confirmed by the Leader.  Clients MUST handle reportRejected
+   errors (Section 4.6.2) during this upload.
 
 4.6.5.  Report Extensions
 
@@ -1811,7 +1803,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    to combine into a valid, refined measurement.
 
    VDAF preparation is mapped onto an aggregation job as illustrated in
-   Figure 5.  The protocol is comprised of a sequence of HTTP requests
+   Figure 4.  The protocol is comprised of a sequence of HTTP requests
    from the Leader to the Helper, the first of which includes the
    aggregation parameter, the Helper's report share for each report in
    the job, and for each report the initialization step for preparation.
@@ -1852,7 +1844,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
       v                                                     v
      leader_out_share                         helper_out_share
 
-           Figure 5: Overview of the DAP aggregation interaction.
+           Figure 4: Overview of the DAP aggregation interaction.
 
    The number of steps, and the type of the responses, depends on the
    VDAF.  The message structures and processing rules are specified in
@@ -3377,7 +3369,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    In addition, for each DAP task, the Leader is required to:
 
    *  Implement and store state for the form of inter- and intra-batch
-      replay mitigation in Figure 5.  This requires storing the report
+      replay mitigation in Figure 4.  This requires storing the report
       IDs of all reports processed for a given task.  Implementations
       may find it helpful to track additional information, like the
       timestamp, so that the storage used for anti-replay can be sharded
