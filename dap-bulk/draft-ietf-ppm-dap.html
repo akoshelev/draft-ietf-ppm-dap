@@ -3691,19 +3691,21 @@ wastes both server and client resources and network bandwidth.<a href="#section-
 enumerated by the Server using 0-based indexing. Monotonically increasing report index
 is used to communicate the upload status to the Client.<a href="#section-4.6.4-2" class="pilcrow">¶</a></p>
 <p id="section-4.6.4-3">Any report in the upload may be rejected for reasons listed in (<a href="#upload-request" class="auto internal xref">Section 4.6.2</a>).<a href="#section-4.6.4-3" class="pilcrow">¶</a></p>
-<p id="section-4.6.4-4">Leader <span class="bcp14">SHOULD</span> provide a means to Clients to obtain status of the upload.
-~~~ tls-presentation
+<p id="section-4.6.4-4">Leader <span class="bcp14">SHOULD</span> provide a means to Clients to obtain status of the upload.<a href="#section-4.6.4-4" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-4.6.4-5">
+<pre>
 struct {
-/* The index of the latest report processed so far by the server <em>/
+/* The index of the latest report processed so far by the server */
 uint32 latest_index,
-/</em> The list of indices of reports rejected on the server side */
+/* The list of indices of reports rejected on the server side */
 uint32 rejected&lt;..&gt;,
 } BulkReportStatus;
-~~~<a href="#section-4.6.4-4" class="pilcrow">¶</a></p>
-<p id="section-4.6.4-5">Server <span class="bcp14">MAY</span> compress large sequences of rejected reports into ranges, to avoid payload blowout.<a href="#section-4.6.4-5" class="pilcrow">¶</a></p>
-<p id="section-4.6.4-6">If bulk upload request fails for any reason, Client <span class="bcp14">MAY</span> choose to submit bulk upload request again.
+</pre><a href="#section-4.6.4-5" class="pilcrow">¶</a>
+</div>
+<p id="section-4.6.4-6">Server <span class="bcp14">MAY</span> compress large sequences of rejected reports into ranges, to avoid payload blowout.<a href="#section-4.6.4-6" class="pilcrow">¶</a></p>
+<p id="section-4.6.4-7">If bulk upload request fails for any reason, Client <span class="bcp14">MAY</span> choose to submit bulk upload request again.
 Client <span class="bcp14">SHOULD</span> only include reports not confirmed by the Leader. Clients <span class="bcp14">MUST</span> handle
-<code>reportRejected</code> errors (<a href="#upload-request" class="auto internal xref">Section 4.6.2</a>) during this upload.<a href="#section-4.6.4-6" class="pilcrow">¶</a></p>
+<code>reportRejected</code> errors (<a href="#upload-request" class="auto internal xref">Section 4.6.2</a>) during this upload.<a href="#section-4.6.4-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="report-extensions">

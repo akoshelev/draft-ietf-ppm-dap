@@ -1722,10 +1722,14 @@ aggregation job 1                   aggregation job 2          aggregation job j
    (Section 4.6.2).
 
    Leader SHOULD provide a means to Clients to obtain status of the
-   upload. ~~~ tls-presentation struct { /* The index of the latest
-   report processed so far by the server _/ uint32 latest_index, /_ The
-   list of indices of reports rejected on the server side */ uint32
-   rejected<..>, } BulkReportStatus; ~~~
+   upload.
+
+   struct {
+   /* The index of the latest report processed so far by the server */
+   uint32 latest_index,
+   /* The list of indices of reports rejected on the server side */
+   uint32 rejected<..>,
+   } BulkReportStatus;
 
    Server MAY compress large sequences of rejected reports into ranges,
    to avoid payload blowout.
