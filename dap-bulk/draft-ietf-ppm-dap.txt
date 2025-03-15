@@ -5,14 +5,14 @@
 Network Working Group                                       T. Geoghegan
 Internet-Draft                                                      ISRG
 Intended status: Standards Track                               C. Patton
-Expires: 10 September 2025                                    Cloudflare
+Expires: 16 September 2025                                    Cloudflare
                                                                B. Pitman
                                                                     ISRG
                                                              E. Rescorla
                                                              Independent
                                                               C. A. Wood
                                                               Cloudflare
-                                                            9 March 2025
+                                                           15 March 2025
 
 
   Distributed Aggregation Protocol for Privacy Preserving Measurement
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 September 2025.
+   This Internet-Draft will expire on 16 September 2025.
 
 Copyright Notice
 
@@ -1681,7 +1681,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    strictly a performance optimization.
 
    The "application/dap-bulk-report" format contains a prologue that
-   encodes extensions that are common to all reports.  The header is
+   encodes extensions that are common to all reports.  The prologue is
    followed by any number of reports, from which those shared fields are
    removed.
 
@@ -4647,6 +4647,11 @@ Contributors
    Email: csharrison@chromium.org
 
 
+   Alex Koshelev
+   Meta
+   Email: koshelev@meta.com
+
+
    Peter Saint-Andre
    Email: stpeter@gmail.com
 
@@ -4669,11 +4674,6 @@ Contributors
    Shan Wang
    Apple
    Email: shan_wang@apple.com
-
-
-   Alex Koshelev
-   Meta
-   Email: koshelev@meta.com
 
 
 Authors' Addresses
