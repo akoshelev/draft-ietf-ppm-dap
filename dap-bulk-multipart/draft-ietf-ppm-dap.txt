@@ -1596,7 +1596,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Otherwise, the Leader responds with HTTP status 200, a body
    consisting of UploadResponse and the media type application/dap-
-   report-resp`. If the entire upload has been successfully completed,
+   report-resp. If the entire upload has been successfully completed,
    the Leader MAY respond with an empty body.
 
    For each report in the upload, the Leader creates ReportUploadStatus

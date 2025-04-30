@@ -3626,7 +3626,7 @@ ReportUploadStatus status&lt;0..2^32-1&gt;;
 <p id="section-4.5.2-21">If the Leader does not recognize the task ID, then it aborts with error
 <code>unrecognizedTask</code>.<a href="#section-4.5.2-21" class="pilcrow">¶</a></p>
 <p id="section-4.5.2-22">Otherwise, the Leader responds with HTTP status 200, a body consisting
-of <code>UploadResponse</code> and the media type application/dap-report-resp`. If
+of <code>UploadResponse</code> and the media type <code>application/dap-report-resp</code>. If
 the entire upload has been successfully completed, the Leader <span class="bcp14">MAY</span> respond with
 an empty body.<a href="#section-4.5.2-22" class="pilcrow">¶</a></p>
 <p id="section-4.5.2-23">For each report in the upload, the Leader creates <code>ReportUploadStatus</code> struct
