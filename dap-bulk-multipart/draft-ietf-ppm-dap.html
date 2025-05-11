@@ -1549,14 +1549,33 @@ aggregator.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1.1-3">15:<a href="#section-1.1-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1.1-4.1">
-            <p id="section-1.1-4.1.1">Reorganize text for clarity and flow.<a href="#section-1.1-4.1.1" class="pilcrow">¶</a></p>
+            <p id="section-1.1-4.1.1">Specify body of responses to aggregation job GET requests. (#651)<a href="#section-1.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-1.1-4.2">
-            <p id="section-1.1-4.2.1">Define consistent semantics for long-running interactions: aggregation jobs,
-collection jobs and aggregate shares. (*)<a href="#section-1.1-4.2.1" class="pilcrow">¶</a></p>
+            <p id="section-1.1-4.2.1">Add diagram illustrating object lifecycles and relationships. (#655)<a href="#section-1.1-4.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-1.1-4.3">
-            <p id="section-1.1-4.3.1">Bump version tag from "dap-14" to "dap-15". (*)<a href="#section-1.1-4.3.1" class="pilcrow">¶</a></p>
+            <p id="section-1.1-4.3.1">Use aasvg for prettier diagrams. (#657)<a href="#section-1.1-4.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-1.1-4.4">
+            <p id="section-1.1-4.4.1">Add more precise description of time and intervals. (#658)<a href="#section-1.1-4.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-1.1-4.5">
+            <p id="section-1.1-4.5.1">Reorganize text for clarity and flow. (#659, #660, #661, #663, #665, #666,
+#668, #672, #678, #680, #684, #653, #654)<a href="#section-1.1-4.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-1.1-4.6">
+            <p id="section-1.1-4.6.1">Align with RFC 9205 recommendations. (*) (#673, #683)<a href="#section-1.1-4.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-1.1-4.7">
+            <p id="section-1.1-4.7.1">Define consistent semantics for long-running interactions: aggregation jobs,
+collection jobs and aggregate shares. (*) (#674, #675, #677)<a href="#section-1.1-4.7.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-1.1-4.8">
+            <p id="section-1.1-4.8.1">Add security consideration for predictable task IDs. (#679)<a href="#section-1.1-4.8.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-1.1-4.9">
+            <p id="section-1.1-4.9.1">Bump version tag from "dap-14" to "dap-15". (*)<a href="#section-1.1-4.9.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-1.1-5">14:<a href="#section-1.1-5" class="pilcrow">¶</a></p>
@@ -3547,7 +3566,7 @@ shares and the public share using the VDAF's sharding algorithm (<span><a href="
 <div class="lang-pseudocode sourcecode" id="section-4.5.2-8">
 <pre>
 (public_share, input_shares) = Vdaf.shard(
-    "dap-14" || task_id,
+    "dap-15" || task_id,
     measurement,
     report_id,
     rand,
@@ -3596,7 +3615,7 @@ struct {
 <div class="lang-pseudocode sourcecode" id="section-4.5.2-15">
 <pre>
 enc, payload = SealBase(pk,
-  "dap-14 input share" || 0x01 || server_role,
+  "dap-15 input share" || 0x01 || server_role,
   input_share_aad, plaintext_input_share)
 </pre><a href="#section-4.5.2-15" class="pilcrow">¶</a>
 </div>
@@ -4032,7 +4051,7 @@ and removes it from the candidate set.<a href="#section-4.6.2.1-2" class="pilcro
 <pre>
 (state, outbound) = Vdaf.ping_pong_leader_init(
     vdaf_verify_key,
-    "dap-14" || task_id,
+    "dap-15" || task_id,
     agg_param,
     report_id,
     public_share,
@@ -4155,7 +4174,7 @@ the Leader <span class="bcp14">MUST</span> abort the aggregation job.<a href="#s
 <div class="lang-pseudocode sourcecode" id="section-4.6.2.1-22.1.2">
 <pre>
 (state, outbound) = Vdaf.ping_pong_leader_continued(
-    "dap-14" || task_id,
+    "dap-15" || task_id,
     agg_param,
     prev_state,
     inbound,
@@ -4287,7 +4306,7 @@ For all other reports it initializes the VDAF prep state as follows:<a href="#se
 <pre>
 (state, outbound) = Vdaf.ping_pong_helper_init(
     vdaf_verify_key,
-    "dap-14" || task_id,
+    "dap-15" || task_id,
     agg_param,
     report_id,
     public_share,
@@ -4391,7 +4410,7 @@ decryption of the payload with the following procedure:<a href="#section-4.6.2.3
 <div class="lang-pseudocode sourcecode" id="section-4.6.2.3-2">
 <pre>
 plaintext_input_share = OpenBase(encrypted_input_share.enc, sk,
-  "dap-14 input share" || 0x01 || server_role,
+  "dap-15 input share" || 0x01 || server_role,
   input_share_aad, encrypted_input_share.payload)
 </pre><a href="#section-4.6.2.3-2" class="pilcrow">¶</a>
 </div>
@@ -4609,7 +4628,7 @@ same order as the Leader's <code>AggregationJobContinueReq</code>. Otherwise, th
 <div class="lang-pseudocode sourcecode" id="section-4.6.3.1-12.1.2">
 <pre>
 (state, outbound) = Vdaf.ping_pong_leader_continued(
-    "dap-14" || task_id,
+    "dap-15" || task_id,
     agg_param,
     state,
     inbound,
@@ -4707,7 +4726,7 @@ computes the following:<a href="#section-4.6.3.2-12" class="pilcrow">¶</a></p>
 <div class="lang-pseudocode sourcecode" id="section-4.6.3.2-13">
 <pre>
 (state, outbound) = Vdaf.ping_pong_helper_continued(
-    "dap-14" || task_id,
+    "dap-15" || task_id,
     agg_param,
     state,
     inbound,
@@ -4874,7 +4893,7 @@ successfully advances from step <code>n</code> to <code>n+1</code>, but its <cod
 response to the Leader gets dropped due to something like a transient network
 failure. The Leader could then resend the request to have the Helper advance to
 step <code>n+1</code> and the Helper should be able to retransmit the <code>AggregationJobResp</code>
-that was previously dropped. To make that kind ofrecovery possible, Aggregator
+that was previously dropped. To make that kind of recovery possible, Aggregator
 implementations <span class="bcp14">SHOULD</span> checkpoint the most recent step's prep state and messages
 to durable storage such that the Leader can re-construct continuation requests
 and the Helper can re-construct continuation responses as needed.<a href="#section-4.6.3.4-1" class="pilcrow">¶</a></p>
@@ -5584,7 +5603,7 @@ done as follows:<a href="#section-4.7.6-1" class="pilcrow">¶</a></p>
 <pre>
 (enc, payload) = SealBase(
     pk,
-    "dap-14 aggregate share" || server_role || 0x00,
+    "dap-15 aggregate share" || server_role || 0x00,
     agg_share_aad,
     agg_share)
 </pre><a href="#section-4.7.6-2" class="pilcrow">¶</a>
@@ -5636,7 +5655,7 @@ batch selector, decryption works as follows:<a href="#section-4.7.6-7" class="pi
 agg_share = OpenBase(
     enc_share.enc,
     sk,
-    "dap-14 aggregate share" || server_role || 0x00,
+    "dap-15 aggregate share" || server_role || 0x00,
     agg_share_aad,
     enc_share.payload)
 </pre><a href="#section-4.7.6-8" class="pilcrow">¶</a>
