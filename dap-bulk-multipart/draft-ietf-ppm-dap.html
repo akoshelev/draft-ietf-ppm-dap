@@ -1055,11 +1055,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">DAP</td>
-<td class="right">April 2025</td>
+<td class="right">May 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Geoghegan, et al.</td>
-<td class="center">Expires 1 November 2025</td>
+<td class="center">Expires 12 November 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1072,12 +1072,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-ppm-dap-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-04-30" class="published">30 April 2025</time>
+<time datetime="2025-05-11" class="published">11 May 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-11-01">1 November 2025</time></dd>
+<dd class="expires"><time datetime="2025-11-12">12 November 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1151,7 +1151,7 @@ without revealing any individual contributor's data.<a href="#section-abstract-1
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 1 November 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 12 November 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1455,7 +1455,7 @@ without revealing any individual contributor's data.<a href="#section-abstract-1
                     <p id="section-toc.1-1.9.2.1.2.1.1"><a href="#section-9.1.1" class="auto internal xref">9.1.1</a>.  <a href="#name-application-dap-hpke-config" class="internal xref">"application/dap-hpke-config-list" media type</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1.2.2">
-                    <p id="section-toc.1-1.9.2.1.2.2.1"><a href="#section-9.1.2" class="auto internal xref">9.1.2</a>.  <a href="#name-application-dap-report-medi" class="internal xref">"application/dap-report" media type</a></p>
+                    <p id="section-toc.1-1.9.2.1.2.2.1"><a href="#section-9.1.2" class="auto internal xref">9.1.2</a>.  <a href="#name-application-dap-report-req-" class="internal xref">"application/dap-report-req" media type</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1.2.3">
                     <p id="section-toc.1-1.9.2.1.2.3.1"><a href="#section-9.1.3" class="auto internal xref">9.1.3</a>.  <a href="#name-application-dap-report-resp" class="internal xref">"application/dap-report-resp" media type</a></p>
@@ -3125,6 +3125,27 @@ in different situations.<a href="#section-4.1-7" class="pilcrow">¶</a></p>
 struct {} Empty;
 </pre><a href="#section-4.1-9" class="pilcrow">¶</a>
 </div>
+<p id="section-4.1-10">Errors that occurred during processing individual reports are represented
+by the following enum:<a href="#section-4.1-10" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-4.1-11">
+<pre>
+enum {
+  reserved(0),
+  batch_collected(1),
+  report_replayed(2),
+  report_dropped(3),
+  hpke_unknown_config_id(4),
+  hpke_decrypt_error(5),
+  vdaf_prep_error(6),
+  task_expired(7),
+  invalid_message(8),
+  report_too_early(9),
+  task_not_started(10),
+  outdated_config(11),
+  (255)
+} ReportError;
+</pre><a href="#section-4.1-11" class="pilcrow">¶</a>
+</div>
 <div id="timestamps">
 <section id="section-4.1.1">
           <h4 id="name-times-durations-and-interva">
@@ -3463,7 +3484,7 @@ encoded([
 <a href="#section-4.5.2" class="section-number selfRef">4.5.2. </a><a href="#name-upload-request" class="section-name selfRef">Upload Request</a>
           </h4>
 <p id="section-4.5.2-1">Clients upload reports by sending a POST to <code>{leader}/tasks/{task-id}/reports</code>.
-The body is a <code>UploadRequest</code>, with media type "application/dap-report", structured as
+The body is a <code>UploadRequest</code>, with media type "application/dap-report-req", structured as
 follows:<a href="#section-4.5.2-1" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-4.5.2-2">
 <pre>
@@ -3612,12 +3633,12 @@ struct {
 <div class="lang-tls-presentation sourcecode" id="section-4.5.2-19">
 <pre>
 struct {
-ReportID id;
-ReportError error;
+  ReportID id;
+  ReportError error;
 } ReportUploadStatus;
 
 struct {
-ReportUploadStatus status&lt;0..2^32-1&gt;;
+  ReportUploadStatus status&lt;0..2^32-1&gt;;
 } UploadResponse;
 </pre><a href="#section-4.5.2-19" class="pilcrow">¶</a>
 </div>
@@ -3625,36 +3646,35 @@ ReportUploadStatus status&lt;0..2^32-1&gt;;
 <code>invalidMessage</code>.<a href="#section-4.5.2-20" class="pilcrow">¶</a></p>
 <p id="section-4.5.2-21">If the Leader does not recognize the task ID, then it aborts with error
 <code>unrecognizedTask</code>.<a href="#section-4.5.2-21" class="pilcrow">¶</a></p>
-<p id="section-4.5.2-22">Otherwise, the Leader responds with HTTP status 200, a body consisting
-of <code>UploadResponse</code> and the media type <code>application/dap-report-resp</code>. If
-the entire upload has been successfully completed, the Leader <span class="bcp14">MAY</span> respond with
-an empty body.<a href="#section-4.5.2-22" class="pilcrow">¶</a></p>
-<p id="section-4.5.2-23">For each report in the upload, the Leader creates <code>ReportUploadStatus</code> struct
-and adds the <code>ReportId</code> to it. If there was no error during the processing,
-the Leader sets the <code>error</code> to <code>none</code>.<a href="#section-4.5.2-23" class="pilcrow">¶</a></p>
-<p id="section-4.5.2-24">If the Leader does not recognize the <code>config_id</code> in the encrypted input share,
+<p id="section-4.5.2-22">Otherwise, the Leader responds with a body consisting of an <code>UploadResponse</code> and
+the media type <code>application/dap-report-resp</code>. The Leader only includes reports
+that failed processing in the response. For each report that failed to upload,
+the Leader creates a <code>ReportUploadStatus</code> struct and includes the <code>ReportId</code>
+from the input and a <code>ReportError</code> <a href="#basic-definitions" class="auto internal xref">Section 4.1</a> that describes the
+failure.<a href="#section-4.5.2-22" class="pilcrow">¶</a></p>
+<p id="section-4.5.2-23">If the Leader does not recognize the <code>config_id</code> in the encrypted input share,
 it sets the error field to <code>outdated_config</code>
 (see <a href="#aggregation-helper-init" class="auto internal xref">Section 4.6.2.2</a>). When the Client receives an
 <code>outdated_config</code> error, it <span class="bcp14">SHOULD</span> invalidate any cached <code>HpkeConfigList</code> and
 retry with a freshly generated <code>Report</code>. If this retried upload does not
-succeed, the Client <span class="bcp14">SHOULD</span> abort and discontinue retrying.<a href="#section-4.5.2-24" class="pilcrow">¶</a></p>
-<p id="section-4.5.2-25">If a report's ID matches that of a previously uploaded report, the Leader <span class="bcp14">MUST</span>
+succeed, the Client <span class="bcp14">SHOULD</span> abort and discontinue retrying.<a href="#section-4.5.2-23" class="pilcrow">¶</a></p>
+<p id="section-4.5.2-24">If a report's ID matches that of a previously uploaded report, the Leader <span class="bcp14">MUST</span>
 ignore it. In addition, it <span class="bcp14">MAY</span> alert the Client with setting the
-error field to <code>report_replayed</code>.<a href="#section-4.5.2-25" class="pilcrow">¶</a></p>
-<p id="section-4.5.2-26">The Leader <span class="bcp14">MUST</span> ignore any report pertaining to a batch that has already been
+error field to <code>report_replayed</code>.<a href="#section-4.5.2-24" class="pilcrow">¶</a></p>
+<p id="section-4.5.2-25">The Leader <span class="bcp14">MUST</span> ignore any report pertaining to a batch that has already been
 collected (see <a href="#replay-protection" class="auto internal xref">Section 2.3</a> for details). The Leader <span class="bcp14">MAY</span> also return
-<code>report_replayed</code> error for this report.<a href="#section-4.5.2-26" class="pilcrow">¶</a></p>
-<p id="section-4.5.2-27">The Leader <span class="bcp14">MUST</span> ignore any report whose timestamp is outside of the task's
+<code>report_replayed</code> error for this report.<a href="#section-4.5.2-25" class="pilcrow">¶</a></p>
+<p id="section-4.5.2-26">The Leader <span class="bcp14">MUST</span> ignore any report whose timestamp is outside of the task's
 <code>time_interval</code>. When it does so, it <span class="bcp14">SHOULD</span> also set the error field to
-<code>report_dropped</code> for the corresponding report in the response.<a href="#section-4.5.2-27" class="pilcrow">¶</a></p>
-<p id="section-4.5.2-28">The Leader may need to buffer reports while waiting to aggregate them (e.g.,
+<code>report_dropped</code> for the corresponding report in the response.<a href="#section-4.5.2-26" class="pilcrow">¶</a></p>
+<p id="section-4.5.2-27">The Leader may need to buffer reports while waiting to aggregate them (e.g.,
 while waiting for an aggregation parameter from the Collector; see
 <a href="#collect-flow" class="auto internal xref">Section 4.7</a>). The Leader <span class="bcp14">SHOULD NOT</span> accept reports whose timestamps are too
 far in the future. Implementors <span class="bcp14">MAY</span> provide for some small leeway, usually no
 more than a few minutes, to account for clock skew. If the Leader rejects a
 report for this reason, it <span class="bcp14">SHOULD</span> indicate it with <code>report_too_early</code> error.
-In this situation, the Client <span class="bcp14">MAY</span> re-upload the report later on.<a href="#section-4.5.2-28" class="pilcrow">¶</a></p>
-<p id="section-4.5.2-29">If the report contains an unrecognized public report extension, or if the
+In this situation, the Client <span class="bcp14">MAY</span> re-upload the report later on.<a href="#section-4.5.2-27" class="pilcrow">¶</a></p>
+<p id="section-4.5.2-28">If the report contains an unrecognized public report extension, or if the
 Leader's input share contains an unrecognized private report extension, then the
 Leader <span class="bcp14">MUST</span> ignore the report and <span class="bcp14">MAY</span> abort with error <code>unsupportedExtension</code>.
 If the Leader does abort for this reason, it <span class="bcp14">SHOULD</span> indicate the unsupported
@@ -3662,15 +3682,15 @@ extensions in the resulting problem document via an extension member (<span><a h
 <span class="bcp14">MUST</span> contain an array of numbers indicating the extension code points which were
 not recognized. For example, if the report upload contained two unsupported
 extensions with code points <code>23</code> and <code>42</code>, the "unsupported_extensions" member
-would contain the JSON value <code>[23, 42]</code>.<a href="#section-4.5.2-29" class="pilcrow">¶</a></p>
-<p id="section-4.5.2-30">If the same extension type appears more than once among the public extensions
+would contain the JSON value <code>[23, 42]</code>.<a href="#section-4.5.2-28" class="pilcrow">¶</a></p>
+<p id="section-4.5.2-29">If the same extension type appears more than once among the public extensions
 and the private extensions in the Leader's input share, then the Leader <span class="bcp14">MUST</span>
-ignore the report and <span class="bcp14">MAY</span> abort with error <code>invalidMessage</code>.<a href="#section-4.5.2-30" class="pilcrow">¶</a></p>
-<p id="section-4.5.2-31">Validation of anti-replay and extensions is not mandatory during the handling of
+ignore the report and <span class="bcp14">MAY</span> abort with error <code>invalidMessage</code>.<a href="#section-4.5.2-29" class="pilcrow">¶</a></p>
+<p id="section-4.5.2-30">Validation of anti-replay and extensions is not mandatory during the handling of
 upload requests to avoid blocking on storage transactions or decryption of input
 shares. The Leader also cannot validate the Helper's extensions because it
 cannot decrypt the Helper's input share. Validation of report IDs and extensions
-will occur before aggregation.<a href="#section-4.5.2-31" class="pilcrow">¶</a></p>
+will occur before aggregation.<a href="#section-4.5.2-30" class="pilcrow">¶</a></p>
 <div id="example-1">
 <section id="section-4.5.2.1">
             <h5 id="name-example-2">
@@ -3681,7 +3701,7 @@ will occur before aggregation.<a href="#section-4.5.2-31" class="pilcrow">¶</a>
 <pre>
 POST /leader/tasks/8BY0RzZMzxvA46_8ymhzycOB9krN-QIGYvg_RsByGec/reports
 Host: example.com
-Content-Type: application/dap-report
+Content-Type: application/dap-report-req
 
 encoded(struct {
   reports = [struct {
@@ -3713,7 +3733,7 @@ HTTP/1.1 200
 <pre>
 POST /leader/tasks/8BY0RzZMzxvA46_8ymhzycOB9krN-QIGYvg_RsByGec/reports
 Host: example.com
-Content-Type: application/dap-report
+Content-Type: application/dap-report-req
 
 encoded(struct {
   reports = [struct {
@@ -4236,23 +4256,6 @@ enum {
   (255)
 } PrepareRespState;
 
-enum {
-  reserved(0),
-  none(1),
-  batch_collected(2),
-  report_replayed(3),
-  report_dropped(4),
-  hpke_unknown_config_id(5),
-  hpke_decrypt_error(6),
-  vdaf_prep_error(7),
-  task_expired(8),
-  invalid_message(9),
-  report_too_early(10),
-  task_not_started(11),
-  outdated_config(12),
-  (255)
-} ReportError;
-
 struct {
   ReportID report_id;
   PrepareRespState prepare_resp_state;
@@ -4277,7 +4280,8 @@ variant {
 } PrepareResp;
 </pre><a href="#section-4.6.2.2-11" class="pilcrow">¶</a>
 </div>
-<p id="section-4.6.2.2-12">where <code>report_id</code> is the report ID and <code>report_error</code> is the indicated error.
+<p id="section-4.6.2.2-12">where <code>report_id</code> is the report ID and <code>report_error</code> is the indicated error
+defined in <a href="#basic-definitions" class="auto internal xref">Section 4.1</a>.
 For all other reports it initializes the VDAF prep state as follows:<a href="#section-4.6.2.2-12" class="pilcrow">¶</a></p>
 <div class="lang-pseudocode sourcecode" id="section-4.6.2.2-13">
 <pre>
@@ -6546,7 +6550,7 @@ corresponding media types:<a href="#section-9.1-1" class="pilcrow">¶</a></p>
             <p id="section-9.1-2.1.1">HpkeConfigList <a href="#hpke-config" class="auto internal xref">Section 4.5.1</a>: "application/dap-hpke-config-list"<a href="#section-9.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-9.1-2.2">
-            <p id="section-9.1-2.2.1">UploadRequest <a href="#upload-request" class="auto internal xref">Section 4.5.2</a>: "application/dap-report"<a href="#section-9.1-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-9.1-2.2.1">UploadRequest <a href="#upload-request" class="auto internal xref">Section 4.5.2</a>: "application/dap-report-req"<a href="#section-9.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-9.1-2.3">
             <p id="section-9.1-2.3.1">UploadResponse <a href="#upload-request" class="auto internal xref">Section 4.5.2</a>: "application/dap-report-resp"<a href="#section-9.1-2.3.1" class="pilcrow">¶</a></p>
@@ -6586,7 +6590,7 @@ component is using. This <span class="bcp14">MAY</span> be used as a hint by the
 to do compatibility checks between client and server.
 For example, A report submission to leader from a client that supports
 draft-ietf-ppm-dap-09 could have the header
-<code>Content-Type: application/dap-report;version=09</code>.<a href="#section-9.1-4" class="pilcrow">¶</a></p>
+<code>Content-Type: application/dap-report-req;version=09</code>.<a href="#section-9.1-4" class="pilcrow">¶</a></p>
 <p id="section-9.1-5">The "Media Types" registry at https://www.iana.org/assignments/media-types will
 be (RFC EDITOR: replace "will be" with "has been") updated to include each of
 these media types. The information required for each media type is listed in
@@ -6697,10 +6701,10 @@ the remaining subsections.<a href="#section-9.1-5" class="pilcrow">¶</a></p>
 </dl>
 </section>
 </div>
-<div id="applicationdap-report-media-type">
+<div id="applicationdap-report-req-media-type">
 <section id="section-9.1.2">
-          <h4 id="name-application-dap-report-medi">
-<a href="#section-9.1.2" class="section-number selfRef">9.1.2. </a><a href="#name-application-dap-report-medi" class="section-name selfRef">"application/dap-report" media type</a>
+          <h4 id="name-application-dap-report-req-">
+<a href="#section-9.1.2" class="section-number selfRef">9.1.2. </a><a href="#name-application-dap-report-req-" class="section-name selfRef">"application/dap-report-req" media type</a>
           </h4>
 <span class="break"></span><dl class="dlParallel" id="section-9.1.2-1">
             <dt id="section-9.1.2-1.1">Type name:</dt>
@@ -7839,7 +7843,7 @@ aggregation interaction (<a href="#aggregation-helper-init" class="auto internal
                   <code>reserved</code>
 </td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <a href="#aggregation-helper-init" class="auto internal xref">Section 4.6.2.2</a> of RFX XXXX</td>
+                  <a href="#basic-definitions" class="auto internal xref">Section 4.1</a> of RFX XXXX</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
@@ -7849,7 +7853,7 @@ aggregation interaction (<a href="#aggregation-helper-init" class="auto internal
                   <code>batch_collected</code>
 </td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <a href="#aggregation-helper-init" class="auto internal xref">Section 4.6.2.2</a> of RFX XXXX</td>
+                  <a href="#basic-definitions" class="auto internal xref">Section 4.1</a> of RFX XXXX</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
@@ -7859,7 +7863,7 @@ aggregation interaction (<a href="#aggregation-helper-init" class="auto internal
                   <code>report_replayed</code>
 </td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <a href="#aggregation-helper-init" class="auto internal xref">Section 4.6.2.2</a> of RFX XXXX</td>
+                  <a href="#basic-definitions" class="auto internal xref">Section 4.1</a> of RFX XXXX</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
@@ -7869,7 +7873,7 @@ aggregation interaction (<a href="#aggregation-helper-init" class="auto internal
                   <code>report_dropped</code>
 </td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <a href="#aggregation-helper-init" class="auto internal xref">Section 4.6.2.2</a> of RFX XXXX</td>
+                  <a href="#basic-definitions" class="auto internal xref">Section 4.1</a> of RFX XXXX</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
@@ -7879,7 +7883,7 @@ aggregation interaction (<a href="#aggregation-helper-init" class="auto internal
                   <code>hpke_unknown_config_id</code>
 </td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <a href="#aggregation-helper-init" class="auto internal xref">Section 4.6.2.2</a> of RFX XXXX</td>
+                  <a href="#basic-definitions" class="auto internal xref">Section 4.1</a> of RFX XXXX</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
@@ -7889,7 +7893,7 @@ aggregation interaction (<a href="#aggregation-helper-init" class="auto internal
                   <code>hpke_decrypt_error</code>
 </td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <a href="#aggregation-helper-init" class="auto internal xref">Section 4.6.2.2</a> of RFX XXXX</td>
+                  <a href="#basic-definitions" class="auto internal xref">Section 4.1</a> of RFX XXXX</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
@@ -7899,7 +7903,7 @@ aggregation interaction (<a href="#aggregation-helper-init" class="auto internal
                   <code>vdaf_prep_error</code>
 </td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <a href="#aggregation-helper-init" class="auto internal xref">Section 4.6.2.2</a> of RFX XXXX</td>
+                  <a href="#basic-definitions" class="auto internal xref">Section 4.1</a> of RFX XXXX</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
@@ -7909,7 +7913,7 @@ aggregation interaction (<a href="#aggregation-helper-init" class="auto internal
                   <code>task_expired</code>
 </td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <a href="#aggregation-helper-init" class="auto internal xref">Section 4.6.2.2</a> of RFX XXXX</td>
+                  <a href="#basic-definitions" class="auto internal xref">Section 4.1</a> of RFX XXXX</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
@@ -7919,7 +7923,7 @@ aggregation interaction (<a href="#aggregation-helper-init" class="auto internal
                   <code>invalid_message</code>
 </td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <a href="#aggregation-helper-init" class="auto internal xref">Section 4.6.2.2</a> of RFX XXXX</td>
+                  <a href="#basic-definitions" class="auto internal xref">Section 4.1</a> of RFX XXXX</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
@@ -7929,17 +7933,27 @@ aggregation interaction (<a href="#aggregation-helper-init" class="auto internal
                   <code>report_too_early</code>
 </td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <a href="#aggregation-helper-init" class="auto internal xref">Section 4.6.2.2</a> of RFX XXXX</td>
+                  <a href="#basic-definitions" class="auto internal xref">Section 4.1</a> of RFX XXXX</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <code>0x10</code>
+                  <code>0xA</code>
 </td>
                 <td class="text-left" rowspan="1" colspan="1">
                   <code>task_not_started</code>
 </td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <a href="#aggregation-helper-init" class="auto internal xref">Section 4.6.2.2</a> of RFX XXXX</td>
+                  <a href="#basic-definitions" class="auto internal xref">Section 4.1</a> of RFX XXXX</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">
+                  <code>0xB</code>
+</td>
+                <td class="text-left" rowspan="1" colspan="1">
+                  <code>outdated_config</code>
+</td>
+                <td class="text-left" rowspan="1" colspan="1">
+                  <a href="#basic-definitions" class="auto internal xref">Section 4.1</a> of RFX XXXX</td>
               </tr>
             </tbody>
           </table>

@@ -5,14 +5,14 @@
 Network Working Group                                       T. Geoghegan
 Internet-Draft                                                      ISRG
 Intended status: Standards Track                               C. Patton
-Expires: 1 November 2025                                      Cloudflare
+Expires: 12 November 2025                                     Cloudflare
                                                                B. Pitman
                                                                     ISRG
                                                              E. Rescorla
                                                              Independent
                                                               C. A. Wood
                                                               Cloudflare
-                                                           30 April 2025
+                                                             11 May 2025
 
 
   Distributed Aggregation Protocol for Privacy Preserving Measurement
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 1 November 2025.
+   This Internet-Draft will expire on 12 November 2025.
 
 Copyright Notice
 
@@ -160,7 +160,7 @@ Table of Contents
    9.  IANA Considerations
      9.1.  Protocol Message Media Types
        9.1.1.  "application/dap-hpke-config-list" media type
-       9.1.2.  "application/dap-report" media type
+       9.1.2.  "application/dap-report-req" media type
        9.1.3.  "application/dap-report-resp" media type
        9.1.4.  "application/dap-aggregation-job-init-req" media type
        9.1.5.  "application/dap-aggregation-job-resp" media type
@@ -1182,6 +1182,25 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    struct {} Empty;
 
+   Errors that occurred during processing individual reports are
+   represented by the following enum:
+
+   enum {
+     reserved(0),
+     batch_collected(1),
+     report_replayed(2),
+     report_dropped(3),
+     hpke_unknown_config_id(4),
+     hpke_decrypt_error(5),
+     vdaf_prep_error(6),
+     task_expired(7),
+     invalid_message(8),
+     report_too_early(9),
+     task_not_started(10),
+     outdated_config(11),
+     (255)
+   } ReportError;
+
 4.1.1.  Times, Durations and Intervals
 
    uint64 Time;
@@ -1463,7 +1482,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Clients upload reports by sending a POST to {leader}/tasks/{task-
    id}/reports.  The body is a UploadRequest, with media type
-   "application/dap-report", structured as follows:
+   "application/dap-report-req", structured as follows:
 
    struct {
      ReportID report_id;
@@ -1580,12 +1599,12 @@ aggregation job 1                   aggregation job 2          aggregation job j
    } InputShareAad;
 
    struct {
-   ReportID id;
-   ReportError error;
+     ReportID id;
+     ReportError error;
    } ReportUploadStatus;
 
    struct {
-   ReportUploadStatus status<0..2^32-1>;
+     ReportUploadStatus status<0..2^32-1>;
    } UploadResponse;
 
    If the upload request is malformed, the Leader aborts with error
@@ -1594,14 +1613,12 @@ aggregation job 1                   aggregation job 2          aggregation job j
    If the Leader does not recognize the task ID, then it aborts with
    error unrecognizedTask.
 
-   Otherwise, the Leader responds with HTTP status 200, a body
-   consisting of UploadResponse and the media type application/dap-
-   report-resp. If the entire upload has been successfully completed,
-   the Leader MAY respond with an empty body.
-
-   For each report in the upload, the Leader creates ReportUploadStatus
-   struct and adds the ReportId to it.  If there was no error during the
-   processing, the Leader sets the error to none.
+   Otherwise, the Leader responds with a body consisting of an
+   UploadResponse and the media type application/dap-report-resp. The
+   Leader only includes reports that failed processing in the response.
+   For each report that failed to upload, the Leader creates a
+   ReportUploadStatus struct and includes the ReportId from the input
+   and a ReportError Section 4.1 that describes the failure.
 
    If the Leader does not recognize the config_id in the encrypted input
    share, it sets the error field to outdated_config (see
@@ -1662,7 +1679,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    POST /leader/tasks/8BY0RzZMzxvA46_8ymhzycOB9krN-QIGYvg_RsByGec/reports
    Host: example.com
-   Content-Type: application/dap-report
+   Content-Type: application/dap-report-req
 
    encoded(struct {
      reports = [struct {
@@ -1692,7 +1709,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    POST /leader/tasks/8BY0RzZMzxvA46_8ymhzycOB9krN-QIGYvg_RsByGec/reports
    Host: example.com
-   Content-Type: application/dap-report
+   Content-Type: application/dap-report-req
 
    encoded(struct {
      reports = [struct {
@@ -2169,23 +2186,6 @@ aggregation job 1                   aggregation job 2          aggregation job j
      (255)
    } PrepareRespState;
 
-   enum {
-     reserved(0),
-     none(1),
-     batch_collected(2),
-     report_replayed(3),
-     report_dropped(4),
-     hpke_unknown_config_id(5),
-     hpke_decrypt_error(6),
-     vdaf_prep_error(7),
-     task_expired(8),
-     invalid_message(9),
-     report_too_early(10),
-     task_not_started(11),
-     outdated_config(12),
-     (255)
-   } ReportError;
-
    struct {
      ReportID report_id;
      PrepareRespState prepare_resp_state;
@@ -2208,8 +2208,8 @@ aggregation job 1                   aggregation job 2          aggregation job j
    } PrepareResp;
 
    where report_id is the report ID and report_error is the indicated
-   error.  For all other reports it initializes the VDAF prep state as
-   follows:
+   error defined in Section 4.1.  For all other reports it initializes
+   the VDAF prep state as follows:
 
    (state, outbound) = Vdaf.ping_pong_helper_init(
        vdaf_verify_key,
@@ -4180,7 +4180,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    *  HpkeConfigList Section 4.5.1: "application/dap-hpke-config-list"
 
-   *  UploadRequest Section 4.5.2: "application/dap-report"
+   *  UploadRequest Section 4.5.2: "application/dap-report-req"
 
    *  UploadResponse Section 4.5.2: "application/dap-report-resp"
 
@@ -4219,7 +4219,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    used as a hint by the receiver of the request to do compatibility
    checks between client and server.  For example, A report submission
    to leader from a client that supports draft-ietf-ppm-dap-09 could
-   have the header Content-Type: application/dap-report;version=09.
+   have the header Content-Type: application/dap-report-req;version=09.
 
    The "Media Types" registry at https://www.iana.org/assignments/media-
    types will be (RFC EDITOR: replace "will be" with "has been") updated
@@ -4269,7 +4269,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Change controller:  IESG
 
-9.1.2.  "application/dap-report" media type
+9.1.2.  "application/dap-report-req" media type
 
    Type name:  application
 
@@ -4729,34 +4729,36 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    The initial contents of this registry are listed below in Table 4.
 
-     +=======+========================+=============================+
-     | Value | Name                   | Reference                   |
-     +=======+========================+=============================+
-     | 0x00  | reserved               | Section 4.6.2.2 of RFX XXXX |
-     +-------+------------------------+-----------------------------+
-     | 0x01  | batch_collected        | Section 4.6.2.2 of RFX XXXX |
-     +-------+------------------------+-----------------------------+
-     | 0x02  | report_replayed        | Section 4.6.2.2 of RFX XXXX |
-     +-------+------------------------+-----------------------------+
-     | 0x03  | report_dropped         | Section 4.6.2.2 of RFX XXXX |
-     +-------+------------------------+-----------------------------+
-     | 0x04  | hpke_unknown_config_id | Section 4.6.2.2 of RFX XXXX |
-     +-------+------------------------+-----------------------------+
-     | 0x05  | hpke_decrypt_error     | Section 4.6.2.2 of RFX XXXX |
-     +-------+------------------------+-----------------------------+
-     | 0x06  | vdaf_prep_error        | Section 4.6.2.2 of RFX XXXX |
-     +-------+------------------------+-----------------------------+
-     | 0x07  | task_expired           | Section 4.6.2.2 of RFX XXXX |
-     +-------+------------------------+-----------------------------+
-     | 0x08  | invalid_message        | Section 4.6.2.2 of RFX XXXX |
-     +-------+------------------------+-----------------------------+
-     | 0x09  | report_too_early       | Section 4.6.2.2 of RFX XXXX |
-     +-------+------------------------+-----------------------------+
-     | 0x10  | task_not_started       | Section 4.6.2.2 of RFX XXXX |
-     +-------+------------------------+-----------------------------+
+       +=======+========================+=========================+
+       | Value | Name                   | Reference               |
+       +=======+========================+=========================+
+       | 0x00  | reserved               | Section 4.1 of RFX XXXX |
+       +-------+------------------------+-------------------------+
+       | 0x01  | batch_collected        | Section 4.1 of RFX XXXX |
+       +-------+------------------------+-------------------------+
+       | 0x02  | report_replayed        | Section 4.1 of RFX XXXX |
+       +-------+------------------------+-------------------------+
+       | 0x03  | report_dropped         | Section 4.1 of RFX XXXX |
+       +-------+------------------------+-------------------------+
+       | 0x04  | hpke_unknown_config_id | Section 4.1 of RFX XXXX |
+       +-------+------------------------+-------------------------+
+       | 0x05  | hpke_decrypt_error     | Section 4.1 of RFX XXXX |
+       +-------+------------------------+-------------------------+
+       | 0x06  | vdaf_prep_error        | Section 4.1 of RFX XXXX |
+       +-------+------------------------+-------------------------+
+       | 0x07  | task_expired           | Section 4.1 of RFX XXXX |
+       +-------+------------------------+-------------------------+
+       | 0x08  | invalid_message        | Section 4.1 of RFX XXXX |
+       +-------+------------------------+-------------------------+
+       | 0x09  | report_too_early       | Section 4.1 of RFX XXXX |
+       +-------+------------------------+-------------------------+
+       | 0xA   | task_not_started       | Section 4.1 of RFX XXXX |
+       +-------+------------------------+-------------------------+
+       | 0xB   | outdated_config        | Section 4.1 of RFX XXXX |
+       +-------+------------------------+-------------------------+
 
-        Table 4: Initial contents of the Report Error Identifiers
-                                registry.
+              Table 4: Initial contents of the Report Error
+                          Identifiers registry.
 
 9.3.  URN Sub-namespace for DAP (urn:ietf:params:ppm:dap)
 
