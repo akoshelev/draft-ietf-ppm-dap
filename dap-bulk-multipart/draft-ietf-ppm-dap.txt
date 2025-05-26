@@ -5,14 +5,14 @@
 Network Working Group                                       T. Geoghegan
 Internet-Draft                                                      ISRG
 Intended status: Standards Track                               C. Patton
-Expires: 12 November 2025                                     Cloudflare
+Expires: 27 November 2025                                     Cloudflare
                                                                B. Pitman
                                                                     ISRG
                                                              E. Rescorla
                                                              Independent
                                                               C. A. Wood
                                                               Cloudflare
-                                                             11 May 2025
+                                                             26 May 2025
 
 
   Distributed Aggregation Protocol for Privacy Preserving Measurement
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 November 2025.
+   This Internet-Draft will expire on 27 November 2025.
 
 Copyright Notice
 
@@ -1513,7 +1513,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    } Report;
 
    struct {
-     Report reports<0..2^32-1>;
+     Report reports[2^32-1];
    } UploadRequest;
 
    Each upload request contains a sequence of Report messages
@@ -1613,15 +1613,6 @@ aggregation job 1                   aggregation job 2          aggregation job j
      opaque public_share<0..2^32-1>;
    } InputShareAad;
 
-   struct {
-     ReportID id;
-     ReportError error;
-   } ReportUploadStatus;
-
-   struct {
-     ReportUploadStatus status<0..2^32-1>;
-   } UploadResponse;
-
    If the upload request is malformed, the Leader aborts with error
    invalidMessage.
 
@@ -1630,7 +1621,23 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Otherwise, the Leader responds with a body consisting of an
    UploadResponse and the media type application/dap-report-resp. The
-   Leader only includes reports that failed processing in the response.
+   structure of the response is shown below:
+
+   struct {
+     ReportID id;
+     ReportError error;
+   } ReportUploadStatus;
+
+   struct {
+     ReportUploadStatus status[2^32-1];
+   } UploadResponse;
+
+   The Leader only includes reports that failed processing in the
+   response.  Reports that are accepted do not have a response.
+
+   Reports in the response follow the same order as specified in the
+   request.
+
    For each report that failed to upload, the Leader creates a
    ReportUploadStatus struct and includes the ReportId from the input
    and a ReportError Section 4.1 that describes the failure.
@@ -1698,22 +1705,22 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    encoded(struct {
      reports = [struct {
-       report_metadata = struct {
-         report_id = [0x0a, 0x0b, 0x0c, 0x0d, ...],
-         time = 1741986088,
-         public_extensions = [0x00, 0x00],
-       } ReportMetadata,
-       public_share = [0x0a, 0x0b, ...],
-       leader_encrypted_input-share = struct {
-         config_id = 1,
-         enc = [0x0f, 0x0e, 0x0d, 0x0c, ...],
-         payload = [0x0b, 0x0a, 0x09, 0x08, ...],
-       } HpkeCiphertext,
-       helper_encrypted_input-share = struct {
-         config_id = 2,
-         enc = [0x0c, 0x0d, 0x0e, 0x0f, ...],
-         payload = [0x08, 0x00, 0x0a, 0x0b, ...],
-       } HpkeCiphertext,
+         report_metadata = struct {
+           report_id = [0x0a, 0x0b, 0x0c, 0x0d, ...],
+           time = 1741986088,
+           public_extensions = [0x00, 0x00],
+         } ReportMetadata,
+         public_share = [0x0a, 0x0b, ...],
+         leader_encrypted_input-share = struct {
+           config_id = 1,
+           enc = [0x0f, 0x0e, 0x0d, 0x0c, ...],
+           payload = [0x0b, 0x0a, 0x09, 0x08, ...],
+         } HpkeCiphertext,
+         helper_encrypted_input-share = struct {
+           config_id = 2,
+           enc = [0x0c, 0x0d, 0x0e, 0x0f, ...],
+           payload = [0x08, 0x00, 0x0a, 0x0b, ...],
+         } HpkeCiphertext,
        } Report
      ]
    } UploadRequest)
@@ -4767,9 +4774,9 @@ aggregation job 1                   aggregation job 2          aggregation job j
        +-------+------------------------+-------------------------+
        | 0x09  | report_too_early       | Section 4.1 of RFX XXXX |
        +-------+------------------------+-------------------------+
-       | 0xA   | task_not_started       | Section 4.1 of RFX XXXX |
+       | 0x0A  | task_not_started       | Section 4.1 of RFX XXXX |
        +-------+------------------------+-------------------------+
-       | 0xB   | outdated_config        | Section 4.1 of RFX XXXX |
+       | 0x0B  | outdated_config        | Section 4.1 of RFX XXXX |
        +-------+------------------------+-------------------------+
 
               Table 4: Initial contents of the Report Error
