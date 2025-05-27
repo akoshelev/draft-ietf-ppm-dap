@@ -5,14 +5,14 @@
 Network Working Group                                       T. Geoghegan
 Internet-Draft                                                      ISRG
 Intended status: Standards Track                               C. Patton
-Expires: 27 November 2025                                     Cloudflare
+Expires: 28 November 2025                                     Cloudflare
                                                                B. Pitman
                                                                     ISRG
                                                              E. Rescorla
                                                              Independent
                                                               C. A. Wood
                                                               Cloudflare
-                                                             26 May 2025
+                                                             27 May 2025
 
 
   Distributed Aggregation Protocol for Privacy Preserving Measurement
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 27 November 2025.
+   This Internet-Draft will expire on 28 November 2025.
 
 Copyright Notice
 
@@ -160,8 +160,8 @@ Table of Contents
    9.  IANA Considerations
      9.1.  Protocol Message Media Types
        9.1.1.  "application/dap-hpke-config-list" media type
-       9.1.2.  "application/dap-report-req" media type
-       9.1.3.  "application/dap-report-resp" media type
+       9.1.2.  "application/dap-upload-req" media type
+       9.1.3.  "application/dap-upload-resp" media type
        9.1.4.  "application/dap-aggregation-job-init-req" media type
        9.1.5.  "application/dap-aggregation-job-resp" media type
        9.1.6.  "application/dap-aggregation-job-continue-req" media
@@ -1497,7 +1497,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Clients upload reports by sending a POST to {leader}/tasks/{task-
    id}/reports.  The body is a UploadRequest, with media type
-   "application/dap-report-req", structured as follows:
+   "application/dap-upload-req", structured as follows:
 
    struct {
      ReportID report_id;
@@ -1513,7 +1513,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    } Report;
 
    struct {
-     Report reports[2^32-1];
+     Report reports[report_count];
    } UploadRequest;
 
    Each upload request contains a sequence of Report messages
@@ -1540,6 +1540,9 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    *  helper_encrypted_input_share is the Helper's encrypted input
       share.
+
+   The length of the sequence is specified at runtime, but it must not
+   exceed 2^32 - 1 bytes.
 
    Aggregators MAY require Clients to authenticate when uploading
    reports (see Section 8.3).  If it is used, client authentication MUST
@@ -1620,7 +1623,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    error unrecognizedTask.
 
    Otherwise, the Leader responds with a body consisting of an
-   UploadResponse and the media type application/dap-report-resp. The
+   UploadResponse and the media type application/dap-upload-resp. The
    structure of the response is shown below:
 
    struct {
@@ -1629,7 +1632,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    } ReportUploadStatus;
 
    struct {
-     ReportUploadStatus status[2^32-1];
+     ReportUploadStatus status[status_count];
    } UploadResponse;
 
    The Leader only includes reports that failed processing in the
@@ -1640,7 +1643,9 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    For each report that failed to upload, the Leader creates a
    ReportUploadStatus struct and includes the ReportId from the input
-   and a ReportError Section 4.1 that describes the failure.
+   and a ReportError Section 4.1 that describes the failure.  The length
+   of this sequence is always less than or equal to the length of the
+   upload sequence.
 
    If the Leader does not recognize the config_id in the encrypted input
    share, it sets the error field to outdated_config (see
@@ -1701,7 +1706,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    POST /leader/tasks/8BY0RzZMzxvA46_8ymhzycOB9krN-QIGYvg_RsByGec/reports
    Host: example.com
-   Content-Type: application/dap-report-req
+   Content-Type: application/dap-upload-req
 
    encoded(struct {
      reports = [struct {
@@ -1731,7 +1736,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    POST /leader/tasks/8BY0RzZMzxvA46_8ymhzycOB9krN-QIGYvg_RsByGec/reports
    Host: example.com
-   Content-Type: application/dap-report-req
+   Content-Type: application/dap-upload-req
 
    encoded(struct {
      reports = [struct {
@@ -1775,7 +1780,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    } UploadRequest)
 
    HTTP/1.1 200
-   Content-Type: application/dap-report-resp
+   Content-Type: application/dap-upload-resp
 
    encoded(struct {
      reports = [
@@ -4202,9 +4207,9 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    *  HpkeConfigList Section 4.5.1: "application/dap-hpke-config-list"
 
-   *  UploadRequest Section 4.5.2: "application/dap-report-req"
+   *  UploadRequest Section 4.5.2: "application/dap-upload-req"
 
-   *  UploadResponse Section 4.5.2: "application/dap-report-resp"
+   *  UploadResponse Section 4.5.2: "application/dap-upload-resp"
 
    *  AggregationJobInitReq Section 4.6.2.1: "application/dap-
       aggregation-job-init-req"
@@ -4241,7 +4246,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
    used as a hint by the receiver of the request to do compatibility
    checks between client and server.  For example, A report submission
    to leader from a client that supports draft-ietf-ppm-dap-09 could
-   have the header Content-Type: application/dap-report-req;version=09.
+   have the header Content-Type: application/dap-upload-req;version=09.
 
    The "Media Types" registry at https://www.iana.org/assignments/media-
    types will be (RFC EDITOR: replace "will be" with "has been") updated
@@ -4291,7 +4296,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Change controller:  IESG
 
-9.1.2.  "application/dap-report-req" media type
+9.1.2.  "application/dap-upload-req" media type
 
    Type name:  application
 
@@ -4334,7 +4339,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Change controller:  IESG
 
-9.1.3.  "application/dap-report-resp" media type
+9.1.3.  "application/dap-upload-resp" media type
 
    Type name:  application
 
