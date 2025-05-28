@@ -5,14 +5,14 @@
 Network Working Group                                       T. Geoghegan
 Internet-Draft                                                      ISRG
 Intended status: Standards Track                               C. Patton
-Expires: 28 November 2025                                     Cloudflare
+Expires: 29 November 2025                                     Cloudflare
                                                                B. Pitman
                                                                     ISRG
                                                              E. Rescorla
                                                              Independent
                                                               C. A. Wood
                                                               Cloudflare
-                                                             27 May 2025
+                                                             28 May 2025
 
 
   Distributed Aggregation Protocol for Privacy Preserving Measurement
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 28 November 2025.
+   This Internet-Draft will expire on 29 November 2025.
 
 Copyright Notice
 
@@ -1496,7 +1496,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 4.5.2.  Upload Request
 
    Clients upload reports by sending a POST to {leader}/tasks/{task-
-   id}/reports.  The body is a UploadRequest, with media type
+   id}/reports.  The body is an UploadRequest, with media type
    "application/dap-upload-req", structured as follows:
 
    struct {
@@ -1638,21 +1638,21 @@ aggregation job 1                   aggregation job 2          aggregation job j
    The Leader only includes reports that failed processing in the
    response.  Reports that are accepted do not have a response.
 
-   Reports in the response follow the same order as specified in the
+   Reports in the response MUST appear in the same order as in the
    request.
 
    For each report that failed to upload, the Leader creates a
    ReportUploadStatus struct and includes the ReportId from the input
-   and a ReportError Section 4.1 that describes the failure.  The length
-   of this sequence is always less than or equal to the length of the
-   upload sequence.
+   and a ReportError (Section 4.1) that describes the failure.  The
+   length of this sequence is always less than or equal to the length of
+   the upload sequence.
 
    If the Leader does not recognize the config_id in the encrypted input
-   share, it sets the error field to outdated_config (see
-   Section 4.6.2.2).  When the Client receives an outdated_config error,
-   it SHOULD invalidate any cached HpkeConfigList and retry with a
-   freshly generated Report.  If this retried upload does not succeed,
-   the Client SHOULD abort and discontinue retrying.
+   share, it sets the error field to outdated_config.  When the Client
+   receives an outdated_config error, it SHOULD invalidate any cached
+   HpkeConfigList and retry with a freshly generated Report.  If this
+   retried upload does not succeed, the Client SHOULD abort and
+   discontinue retrying.
 
    If a report's ID matches that of a previously uploaded report, the
    Leader MUST ignore it.  In addition, it MAY alert the Client with
