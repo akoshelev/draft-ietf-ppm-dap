@@ -5,14 +5,14 @@
 Network Working Group                                       T. Geoghegan
 Internet-Draft                                                      ISRG
 Intended status: Standards Track                               C. Patton
-Expires: 2 December 2025                                      Cloudflare
+Expires: 3 December 2025                                      Cloudflare
                                                                B. Pitman
                                                                     ISRG
                                                              E. Rescorla
                                                              Independent
                                                               C. A. Wood
                                                               Cloudflare
-                                                             31 May 2025
+                                                             1 June 2025
 
 
   Distributed Aggregation Protocol for Privacy Preserving Measurement
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 December 2025.
+   This Internet-Draft will expire on 3 December 2025.
 
 Copyright Notice
 
@@ -1490,10 +1490,8 @@ aggregation job 1                   aggregation job 2          aggregation job j
      Report reports[message_length];
    } UploadRequest;
 
-   Where message_length is the length in bytes of the enclosing HTTP
-   message.  For example, this could be the HTTP/1.1 Content-Length
-   header field ([RFC9110], Section 8.6) or the sum of the lengths of
-   the data frames in an HTTP/2 message ([RFC9113], Section 8.1).
+   Where message_length is the length of the HTTP message content
+   ([RFC9110], Section 6.4).
 
    Each upload request contains a sequence of Report messages
    constructed as follows:
@@ -4925,10 +4923,6 @@ aggregation job 1                   aggregation job 2          aggregation job j
               Key Derivation Function (HKDF)", RFC 5869,
               DOI 10.17487/RFC5869, May 2010,
               <https://www.rfc-editor.org/rfc/rfc5869>.
-
-   [RFC9113]  Thomson, M., Ed. and C. Benfield, Ed., "HTTP/2", RFC 9113,
-              DOI 10.17487/RFC9113, June 2022,
-              <https://www.rfc-editor.org/rfc/rfc9113>.
 
    [RFC9421]  Backman, A., Ed., Richer, J., Ed., and M. Sporny, "HTTP
               Message Signatures", RFC 9421, DOI 10.17487/RFC9421,
