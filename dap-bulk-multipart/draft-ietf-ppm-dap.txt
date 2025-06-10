@@ -5,14 +5,14 @@
 Network Working Group                                       T. Geoghegan
 Internet-Draft                                                      ISRG
 Intended status: Standards Track                               C. Patton
-Expires: 3 December 2025                                      Cloudflare
+Expires: 12 December 2025                                     Cloudflare
                                                                B. Pitman
                                                                     ISRG
                                                              E. Rescorla
                                                              Independent
                                                               C. A. Wood
                                                               Cloudflare
-                                                             1 June 2025
+                                                            10 June 2025
 
 
   Distributed Aggregation Protocol for Privacy Preserving Measurement
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 3 December 2025.
+   This Internet-Draft will expire on 12 December 2025.
 
 Copyright Notice
 
@@ -1490,11 +1490,11 @@ aggregation job 1                   aggregation job 2          aggregation job j
      Report reports[message_length];
    } UploadRequest;
 
-   Where message_length is the length of the HTTP message content
+   Here message_length denotes the length of the HTTP message content
    ([RFC9110], Section 6.4).
 
-   Each upload request contains a sequence of Report messages
-   constructed as follows:
+   Each upload request contains a sequence of Report with the following
+   fields:
 
    *  report_metadata is public metadata describing the report.
 
@@ -1598,7 +1598,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
 
    Otherwise, the Leader responds with a body consisting of an
    UploadResponse with the media type application/dap-upload-resp. The
-   structure of the response is shown below:
+   structure of the response is as follows:
 
    struct {
      ReportID id;
@@ -1609,7 +1609,7 @@ aggregation job 1                   aggregation job 2          aggregation job j
      ReportUploadStatus status[message_length];
    } UploadResponse;
 
-   Where message_length is the length in bytes of the concatenated
+   Here message_length denotes the length in bytes of the concatenated
    ReportUploadStatus objects.
 
    The Leader only includes reports that failed processing in the
